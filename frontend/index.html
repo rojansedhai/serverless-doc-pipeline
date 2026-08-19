@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Document Processing Portal | Multi-Tenant Serverless Pipeline</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>AWS Document Processing Portal</h1>
+        <span>Multi-Tenant Serverless Architecture • AWS KMS & EventBridge</span>
+      </div>
+    </div>
+
+    <!-- Active Tenant Selector & Utility Actions -->
+    <div class="header-actions">
+      <!-- Tenant Switcher -->
+      <div class="tenant-switch-wrapper">
+        <button class="tenant-pill-btn active" data-tenant="tenant-alpha" id="btn-tenant-alpha">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 7v14M21 7v14M6 11h4M6 15h4M14 11h4M14 15h4M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4M3 7l9-4 9 4"/></svg>
+          <span>Acme Corp (Alpha)</span>
+        </button>
+        <button class="tenant-pill-btn" data-tenant="tenant-beta" id="btn-tenant-beta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <span>Global Logistics (Beta)</span>
+        </button>
+      </div>
+
+      <!-- Auth JWT Inspection -->
+      <button class="btn btn-secondary btn-sm" id="btn-inspect-token" title="View Verified Cognito JWT Claims">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span>JWT Claims</span>
+      </button>
+
+      <!-- Settings -->
+      <button class="btn btn-secondary btn-sm" id="btn-settings" title="Configure Endpoints">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-bar">
+    <div class="nav-tabs">
+      <button class="nav-tab-item active" data-tab="tab-documents">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+        <span>Document Processing & OCR</span>
+      </button>
+      <button class="nav-tab-item" data-tab="tab-security">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>Multi-Tenant Access Control</span>
+      </button>
+      <button class="nav-tab-item" data-tab="tab-architecture">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <span>Infrastructure & Telemetry</span>
+      </button>
+    </div>
+
+    <div class="infra-status-chip">
+      <span class="status-dot"></span>
+      <span id="auth-status-label">Cognito Authenticated: tenant-alpha</span>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="main-wrapper">
+
+    <!-- =====================================================================
+         TAB 1: Document Processing & OCR
+         ===================================================================== -->
+    <div class="tab-pane active" id="tab-documents">
+      <div class="workspace-split">
+        
+        <!-- Left Side: Ingestion & History -->
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          
+          <!-- Ingestion Panel -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span>Invoice & Document Ingestion</span>
+                </h2>
+                <p class="panel-desc">Direct upload to S3 bucket via time-bounded presigned PUT URL</p>
+              </div>
+            </div>
+
+            <!-- Drag and Drop Zone -->
+            <div class="dropzone-box" id="dropzone">
+              <div class="dropzone-icon-circle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+              </div>
+              <span class="dropzone-label">Drop invoice file here or click to browse</span>
+              <span class="dropzone-hint">Supports PDF, PNG, JPG (KMS Encrypted Storage)</span>
+              <input type="file" id="file-input" accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+            </div>
+
+            <!-- Instant Sample Invoice Generator Bar -->
+            <div class="template-bar">
+              <span class="template-label">Instant Test Presets:</span>
+              <div class="template-btn-group">
+                <button class="btn btn-secondary btn-sm" id="btn-sample-cloud">Cloud Compute ($1,420.50)</button>
+                <button class="btn btn-secondary btn-sm" id="btn-sample-saas">SaaS License ($850.00)</button>
+                <button class="btn btn-secondary btn-sm" id="btn-sample-freight">Freight Bill ($2,340.00)</button>
+              </div>
+            </div>
+
+            <!-- Pipeline Live Step Tracker -->
+            <div class="pipeline-progress-bar">
+              <div class="progress-step" id="step-1">
+                <span class="step-num">1</span>
+                <span>JWT Claim</span>
+              </div>
+              <div class="progress-step" id="step-2">
+                <span class="step-num">2</span>
+                <span>Presigned URL</span>
+              </div>
+              <div class="progress-step" id="step-3">
+                <span class="step-num">3</span>
+                <span>S3 Direct PUT</span>
+              </div>
+              <div class="progress-step" id="step-4">
+                <span class="step-num">4</span>
+                <span>EventBridge</span>
+              </div>
+              <div class="progress-step" id="step-5">
+                <span class="step-num">5</span>
+                <span>OCR Processed</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Repository History Table -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <div>
+                <h3 class="panel-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                  <span>Tenant Document Repository</span>
+                </h3>
+                <p class="panel-desc">Processed documents stored in partition: <code id="lbl-tenant-partition">TENANT#tenant-alpha</code></p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="btn-refresh-history">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>Document</th>
+                    <th>Vendor</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody id="doc-history-body">
+                  <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                      No documents ingested in this session yet. Upload a file or click an instant preset.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Side: Active Document Details & Metadata -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                <span>Extracted Document Intelligence</span>
+              </h3>
+              <p class="panel-desc">Structured metadata parsed by AWS OCR worker</p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-download-doc" style="display: none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download PDF</span>
+            </button>
+          </div>
+
+          <!-- Metadata Field Grid -->
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">Vendor Name</span>
+              <span class="detail-value" id="det-vendor">--</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Total Amount</span>
+              <span class="detail-value green" id="det-total">--</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Invoice Number</span>
+              <span class="detail-value mono" id="det-invoice">--</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Processing Time</span>
+              <span class="detail-value mono" id="det-duration">--</span>
+            </div>
+            <div class="detail-item detail-item-full">
+              <span class="detail-label">Document ID</span>
+              <span class="detail-value mono" id="det-doc-id" style="font-size: 0.775rem; color: var(--text-secondary);">--</span>
+            </div>
+            <div class="detail-item detail-item-full">
+              <span class="detail-label">S3 Encrypted Storage Path</span>
+              <span class="detail-value mono" id="det-s3-path" style="font-size: 0.75rem; color: var(--text-muted); word-break: break-all;">--</span>
+            </div>
+          </div>
+
+          <!-- Watermark Status Banner -->
+          <div class="watermark-notice">
+            <span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Watermark: PROCESSED & VERIFIED</span>
+            </span>
+            <span class="badge-status processed" id="det-status-badge">AWAITING INPUT</span>
+          </div>
+
+          <!-- DynamoDB Schema Item View -->
+          <div>
+            <span class="detail-label" style="display: block; margin-bottom: 0.4rem;">DynamoDB Single-Table Item Attributes</span>
+            <pre class="json-box" id="det-raw-json" style="max-height: 200px;">{ "message": "Select or upload a document to inspect" }</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         TAB 2: Multi-Tenant Access Control & IDOR Security Benchmark
+         ===================================================================== -->
+    <div class="tab-pane" id="tab-security">
+      <div class="security-grid">
+        
+        <!-- Left: Exploit Test Panel -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Zero-Trust Multi-Tenant Isolation Test</span>
+              </h2>
+              <p class="panel-desc">Test cryptographic boundary enforcement against cross-tenant data tampering</p>
+            </div>
+          </div>
+
+          <div class="security-exploit-box">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+              <strong>IDOR Protection Model:</strong> API Gateway verifies the JWT issuer signature. Lambda extracts the <code>custom:tenant_id</code> claim directly from the cryptographically verified token. DynamoDB queries strictly enforce <code>PK = TENANT#${claim}</code>.
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+              <button class="btn btn-danger" id="btn-run-idor">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span>Simulate IDOR Exploit</span>
+              </button>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Attacks Tenant Alpha's Doc using Tenant Beta's JWT</span>
+            </div>
+          </div>
+
+          <!-- Hacker & Security Audit Log Output -->
+          <div>
+            <span class="detail-label" style="display: block; margin-bottom: 0.4rem;">Security Audit Trail</span>
+            <div class="audit-terminal" id="security-audit-log">
+              <div class="audit-line info">[System] Security engine initialized. Active Token verified against Cognito User Pool.</div>
+              <div class="audit-line info">[Boundary] Partition enforcement active: custom:tenant_id claim mapping.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Security Architecture Breakdown -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>Multi-Tenant Security Architecture</span>
+              </h3>
+              <p class="panel-desc">Layered zero-trust controls across the serverless stack</p>
+            </div>
+          </div>
+
+          <div class="security-checklist">
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <div>
+                <div class="check-item-title">Cryptographic Identity Propagation</div>
+                <div class="check-item-desc">Client tenant identity is extracted strictly from the verified Cognito JWT token claim (<code>custom:tenant_id</code>). User-supplied URL or body tenant parameters are ignored.</div>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <div>
+                <div class="check-item-title">Dedicated AWS KMS CMK Encryption</div>
+                <div class="check-item-desc">Both S3 object storage and DynamoDB tables are encrypted at rest with automatic key rotation via Customer Managed Key.</div>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <div>
+                <div class="check-item-title">Least-Privilege Scoped IAM Roles</div>
+                <div class="check-item-desc">Presigned URL Lambda is restricted to <code>uploads/*</code>. Document Processor Lambda is restricted to reading <code>uploads/*</code> and writing <code>processed/*</code>.</div>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <div>
+                <div class="check-item-title">Enforced TLS & S3 Bucket Policies</div>
+                <div class="check-item-desc">S3 Bucket policy strictly denies all non-TLS requests (<code>aws:SecureTransport = false</code>) and blocks all public ACLs.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         TAB 3: Infrastructure & Telemetry
+         ===================================================================== -->
+    <div class="tab-pane" id="tab-architecture">
+      
+      <!-- Metrics Row -->
+      <div class="telemetry-metrics-row">
+        <div class="metric-card">
+          <span class="metric-label">Idle Infrastructure Cost</span>
+          <span class="metric-value">$0.00 / mo</span>
+          <span class="metric-sub">Pay-per-request serverless design</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Average Processing Latency</span>
+          <span class="metric-value" id="metric-avg-latency">~850ms</span>
+          <span class="metric-sub">EventBridge to DynamoDB complete</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">S3 Lifecycle Tiering</span>
+          <span class="metric-value">Glacier IR</span>
+          <span class="metric-sub">68% cost reduction after 30 days</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">DynamoDB Design</span>
+          <span class="metric-value">Single-Table</span>
+          <span class="metric-sub">PK: TENANT#ID • SK: DOC#ID</span>
+        </div>
+      </div>
+
+      <!-- Cloud Infrastructure Telemetry Details -->
+      <div class="workspace-split">
+        <div class="card-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">AWS Serverless Architecture Mapping</h3>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;">
+            <p><strong>1. Amazon Cognito:</strong> Issues signed JWT tokens with tenant partition metadata.</p>
+            <p style="margin-top:0.4rem;"><strong>2. API Gateway HTTP API (v2):</strong> Performs sub-millisecond JWT authentication and proxies to Lambdas.</p>
+            <p style="margin-top:0.4rem;"><strong>3. Amazon S3 Storage:</strong> Direct browser-to-S3 presigned PUT uploads, KMS envelope encrypted.</p>
+            <p style="margin-top:0.4rem;"><strong>4. Amazon EventBridge:</strong> Decoupled event bus filtering <code>ObjectCreated</code> notifications.</p>
+            <p style="margin-top:0.4rem;"><strong>5. AWS Lambda OCR Worker:</strong> Extracts invoice fields, watermarks PDF, writes to processed folder.</p>
+            <p style="margin-top:0.4rem;"><strong>6. Amazon DynamoDB:</strong> Single-table partition design with Global Secondary Indexes for tenanted querying.</p>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Active Cloud Environment Outputs</h3>
+          </div>
+          <pre class="json-box" id="env-outputs-json">{
+  "api_endpoint": "Configure via Settings → terraform output api_endpoint",
+  "cognito_user_pool_id": "Configure via Settings → terraform output cognito_user_pool_id",
+  "cognito_user_pool_client_id": "Configure via Settings → terraform output cognito_user_pool_client_id",
+  "dynamodb_table": "Configure via Settings → terraform output dynamodb_table_name",
+  "s3_bucket": "Configure via Settings → terraform output s3_bucket_name",
+  "kms_key_alias": "alias/doc-pipeline-prod"
+}</pre>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <span>Multi-Tenant Serverless Document Processing & Invoicing Pipeline</span>
+    <span>Ready for Medium Case Study • $0 Idle Cost Architecture</span>
+  </footer>
+
+  <!-- Modal: Environment Settings -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal-window">
+      <div class="modal-header-row">
+        <h3 class="modal-title">Environment Configuration</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-settings" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-field">
+          <label>API Gateway Endpoint</label>
+          <input type="text" id="cfg-api-endpoint" required>
+        </div>
+        <div class="form-field">
+          <label>Cognito User Pool ID</label>
+          <input type="text" id="cfg-pool-id" required>
+        </div>
+        <div class="form-field">
+          <label>Cognito App Client ID</label>
+          <input type="text" id="cfg-client-id" required>
+        </div>
+        <div class="form-field">
+          <label>AWS Region</label>
+          <input type="text" id="cfg-region" required>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
+          <button type="submit" class="btn btn-primary">Save & Apply</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Decoded JWT Claims -->
+  <div class="modal-backdrop" id="modal-token">
+    <div class="modal-window">
+      <div class="modal-header-row">
+        <h3 class="modal-title">Cognito JWT ID Token Claims</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div>
+        <span class="detail-label" style="display: block; margin-bottom: 0.4rem;">Decoded Payload (Enforced by API Gateway Authorizer)</span>
+        <pre class="json-box" id="token-decoded-box"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript -->
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

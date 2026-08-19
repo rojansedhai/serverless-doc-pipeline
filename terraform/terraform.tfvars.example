@@ -1,0 +1,10 @@
+aws_region                 = "us-east-1"
+environment                = "prod"
+project_name               = "doc-pipeline"
+s3_retention_days_raw      = 7
+s3_glacier_transition_days = 30
+dynamodb_ttl_days          = 90
+enable_textract            = true
+url_expiration_seconds     = 900
+download_expiration_seconds = 3600
+log_retention_days         = 14

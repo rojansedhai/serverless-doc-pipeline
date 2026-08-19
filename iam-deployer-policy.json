@@ -1,0 +1,125 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CallerIdentityAndLogsDiscovery",
+      "Effect": "Allow",
+      "Action": [
+        "sts:GetCallerIdentity",
+        "logs:DescribeLogGroups",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "S3ScopedManagement",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::doc-pipeline-storage-*"
+      ]
+    },
+    {
+      "Sid": "KMSKeyManagement",
+      "Effect": "Allow",
+      "Action": [
+        "kms:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DynamoDBScopedManagement",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:*:*:table/doc-pipeline-metadata-*",
+        "arn:aws:dynamodb:*:*:table/doc-pipeline-metadata-*/index/*"
+      ]
+    },
+    {
+      "Sid": "LambdaScopedManagement",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:*"
+      ],
+      "Resource": [
+        "arn:aws:lambda:*:*:function:doc-pipeline-*"
+      ]
+    },
+    {
+      "Sid": "IAMRoleAndPolicyScopedManagement",
+      "Effect": "Allow",
+      "Action": [
+        "iam:*"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:role/doc-pipeline-*",
+        "arn:aws:iam::*:policy/doc-pipeline-*"
+      ]
+    },
+    {
+      "Sid": "IAMPassRoleToLambda",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "arn:aws:iam::*:role/doc-pipeline-*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "lambda.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "EventBridgeScopedManagement",
+      "Effect": "Allow",
+      "Action": [
+        "events:*"
+      ],
+      "Resource": [
+        "arn:aws:events:*:*:rule/doc-pipeline-*"
+      ]
+    },
+    {
+      "Sid": "APIGatewayManagement",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:*"
+      ],
+      "Resource": [
+        "arn:aws:apigateway:*::*"
+      ]
+    },
+    {
+      "Sid": "CognitoUserPoolManagement",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:*"
+      ],
+      "Resource": [
+        "arn:aws:cognito-idp:*:*:userpool/*"
+      ]
+    },
+    {
+      "Sid": "CloudWatchLogsScopedManagement",
+      "Effect": "Allow",
+      "Action": [
+        "logs:*"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:log-group:/aws/lambda/doc-pipeline-*",
+        "arn:aws:logs:*:*:log-group:/aws/apigateway/doc-pipeline-*"
+      ]
+    }
+  ]
+}
