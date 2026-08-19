@@ -244,7 +244,7 @@ To destroy all cloud resources and avoid any ongoing storage fees:
 cd terraform
 terraform destroy -auto-approve
 ```
-
+`Note: This will not destroy the S3 buckets if they are not empty so make sure to empty the S3 buckets before running the destroy command.`
 ---
 
 ## 📖 Published Content Artifacts
