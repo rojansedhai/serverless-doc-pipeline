@@ -249,5 +249,5 @@ terraform destroy -auto-approve
 
 ## 📖 Published Content Artifacts
 
-- **Blog Article**: [Building a $0-Idle-Cost Document Processor Using EventBridge and S3 Presigned URLs](file:///c:/Users/rojan.sedhai/Desktop/serverless-doc-pipeline/docs/blog_zero_idle_cost_doc_processor.md)
-- **Technical Whitepaper**: [Comparative Benchmark: Lambda Cold-Start Tuning with Container Images vs. Lambda Layers](file:///c:/Users/rojan.sedhai/Desktop/serverless-doc-pipeline/docs/deep_dive_cold_start_benchmark.md)
+- **Blog Article**: [Stop Paying for Idle Clusters: How I Built a Cheap Document Processing Pipeline on AWS](https://medium.com/@rojansedhai01/stop-paying-for-idle-clusters-how-i-built-a-cheap-document-processing-pipeline-on-aws-54471ff8be24?sharedUserId=rojansedhai01)
+- **Technical Whitepaper**: [Comparative Benchmark: Lambda Cold-Start Tuning with Container Images vs. Lambda Layers](https://github.com/rojansedhai/serverless-doc-pipeline/blob/main/docs/deep_dive_cold_start_benchmark.md)
