@@ -429,19 +429,29 @@
       <form id="form-settings" style="display: flex; flex-direction: column; gap: 0.85rem;">
         <div class="form-field">
           <label>API Gateway Endpoint</label>
-          <input type="text" id="cfg-api-endpoint" required>
+          <input type="text" id="cfg-api-endpoint" placeholder="https://abc123.execute-api.us-east-1.amazonaws.com" required>
         </div>
         <div class="form-field">
           <label>Cognito User Pool ID</label>
-          <input type="text" id="cfg-pool-id" required>
+          <input type="text" id="cfg-pool-id" placeholder="us-east-1_XXXXXXXXX" required>
         </div>
         <div class="form-field">
           <label>Cognito App Client ID</label>
-          <input type="text" id="cfg-client-id" required>
+          <input type="text" id="cfg-client-id" placeholder="26-char alphanumeric client ID" required>
         </div>
         <div class="form-field">
           <label>AWS Region</label>
-          <input type="text" id="cfg-region" required>
+          <input type="text" id="cfg-region" placeholder="us-east-1" value="us-east-1" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-field">
+            <label>Tenant Alpha Password</label>
+            <input type="password" id="cfg-alpha-pwd" placeholder="e.g. Password123!" required>
+          </div>
+          <div class="form-field">
+            <label>Tenant Beta Password</label>
+            <input type="password" id="cfg-beta-pwd" placeholder="e.g. Password123!" required>
+          </div>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
           <button type="submit" class="btn btn-primary">Save & Apply</button>

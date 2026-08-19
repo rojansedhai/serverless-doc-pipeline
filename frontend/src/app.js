@@ -91,6 +91,12 @@ async function authenticateTenant(tenantId) {
   const tenantInfo = state.config.tenants[tenantId];
   if (!tenantInfo) return null;
 
+  if (!tenantInfo.password || tenantInfo.password.startsWith('YOUR_')) {
+    setAuthLabel(`Auth Required: Configure credentials in Settings (⚙️)`);
+    showToast(`Please set ${tenantInfo.name} password in Settings (⚙️)`, 'warning');
+    return null;
+  }
+
   setAuthLabel(`Authenticating ${tenantInfo.name}...`);
 
   try {
@@ -540,25 +546,52 @@ function openTokenModal() {
 }
 
 function openSettingsModal() {
-  document.getElementById('cfg-api-endpoint').value = state.config.apiEndpoint;
-  document.getElementById('cfg-pool-id').value = state.config.cognitoUserPoolId;
-  document.getElementById('cfg-client-id').value = state.config.cognitoClientId;
-  document.getElementById('cfg-region').value = state.config.awsRegion;
+  const currentEp = state.config.apiEndpoint;
+  document.getElementById('cfg-api-endpoint').value = (currentEp && !currentEp.startsWith('YOUR_')) ? currentEp : '';
+
+  const currentPool = state.config.cognitoUserPoolId;
+  document.getElementById('cfg-pool-id').value = (currentPool && !currentPool.startsWith('YOUR_')) ? currentPool : '';
+
+  const currentClient = state.config.cognitoClientId;
+  document.getElementById('cfg-client-id').value = (currentClient && !currentClient.startsWith('YOUR_')) ? currentClient : '';
+
+  document.getElementById('cfg-region').value = state.config.awsRegion || 'us-east-1';
+  
+  const alphaPwd = state.config.tenants?.['tenant-alpha']?.password;
+  document.getElementById('cfg-alpha-pwd').value = (alphaPwd && !alphaPwd.startsWith('YOUR_')) ? alphaPwd : '';
+  
+  const betaPwd = state.config.tenants?.['tenant-beta']?.password;
+  document.getElementById('cfg-beta-pwd').value = (betaPwd && !betaPwd.startsWith('YOUR_')) ? betaPwd : '';
+  
   document.getElementById('modal-settings').classList.add('open');
 }
 
 function handleSaveSettings(e) {
   e.preventDefault();
+  const alphaPwd = document.getElementById('cfg-alpha-pwd').value.trim() || 'Password123!';
+  const betaPwd = document.getElementById('cfg-beta-pwd').value.trim() || 'Password123!';
+
   const updated = {
     ...state.config,
     apiEndpoint: document.getElementById('cfg-api-endpoint').value.trim(),
     cognitoUserPoolId: document.getElementById('cfg-pool-id').value.trim(),
     cognitoClientId: document.getElementById('cfg-client-id').value.trim(),
-    awsRegion: document.getElementById('cfg-region').value.trim()
+    awsRegion: document.getElementById('cfg-region').value.trim(),
+    tenants: {
+      ...state.config.tenants,
+      'tenant-alpha': {
+        ...state.config.tenants['tenant-alpha'],
+        password: alphaPwd
+      },
+      'tenant-beta': {
+        ...state.config.tenants['tenant-beta'],
+        password: betaPwd
+      }
+    }
   };
   saveConfig(updated);
   state.config = updated;
   document.getElementById('modal-settings').classList.remove('open');
-  showToast("Configuration saved. Re-authenticating...", 'success');
+  showToast("Configuration saved. Authenticating with Cognito...", 'success');
   authenticateTenant(state.currentTenant);
 }
