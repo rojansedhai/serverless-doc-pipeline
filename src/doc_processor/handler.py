@@ -162,15 +162,24 @@ def fallback_text_analysis(file_content: bytes, filename: str) -> dict:
 def watermark_and_process_document(file_content: bytes, filename: str, tenant_id: str, doc_id: str) -> bytes:
     """
     Applies a security stamp / watermark banner to the processed document.
+    For binary images (PNG/JPG), returns intact binary to prevent header corruption.
+    For PDF documents, appends the watermark footer without breaking %PDF magic bytes.
     """
+    lower_name = filename.lower()
+    is_image = lower_name.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp', '.tiff', '.tif'))
+    
+    if is_image:
+        # Preserve clean binary image data so browser/image viewers render it perfectly
+        return file_content
+
     timestamp = time.strftime('%Y-%m-%d %H:%M:%SZ', time.gmtime())
-    watermark_header = (
-        f"% PROCESSED & VERIFIED BY SERVERLESS DOC PIPELINE\n"
+    watermark_footer = (
+        f"\n% PROCESSED & VERIFIED BY SERVERLESS DOC PIPELINE\n"
         f"% Tenant-ID: {tenant_id} | Doc-ID: {doc_id} | Timestamp: {timestamp}\n"
     ).encode("utf-8")
     
-    # Prepend/append watermark signature
-    return watermark_header + file_content
+    # Append to PDF preserving initial %PDF header
+    return file_content + watermark_footer
 
 
 def lambda_handler(event, context):
@@ -248,6 +257,17 @@ def lambda_handler(event, context):
         # 5. Upload processed artifact to S3 (processed/{tenant_id}/{doc_id}/processed_{filename})
         processed_key = f"{PROCESSED_PREFIX}/{tenant_id}/{doc_id}/processed_{filename}"
         
+        # Ensure accurate ContentType on processed S3 object
+        lower_name = filename.lower()
+        if lower_name.endswith(".png"):
+            content_type = "image/png"
+        elif lower_name.endswith((".jpg", ".jpeg")):
+            content_type = "image/jpeg"
+        elif lower_name.endswith(".webp"):
+            content_type = "image/webp"
+        elif lower_name.endswith(".pdf"):
+            content_type = "application/pdf"
+
         put_kwargs = {
             "Bucket": bucket,
             "Key": processed_key,

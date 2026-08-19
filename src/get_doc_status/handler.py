@@ -82,16 +82,32 @@ def lambda_handler(event, context):
             s3_processed_key = doc.get("S3ProcessedKey")
             if s3_processed_key and S3_BUCKET:
                 try:
+                    filename = doc.get("Filename", "document.pdf")
+                    content_type = doc.get("ContentType", "application/pdf")
+                    
+                    lower_name = filename.lower()
+                    if lower_name.endswith(".png"):
+                        content_type = "image/png"
+                    elif lower_name.endswith((".jpg", ".jpeg")):
+                        content_type = "image/jpeg"
+                    elif lower_name.endswith(".webp"):
+                        content_type = "image/webp"
+                    elif lower_name.endswith(".pdf"):
+                        content_type = "application/pdf"
+
                     download_url = s3_client.generate_presigned_url(
                         ClientMethod="get_object",
                         Params={
                             "Bucket": S3_BUCKET,
-                            "Key": s3_processed_key
+                            "Key": s3_processed_key,
+                            "ResponseContentType": content_type,
+                            "ResponseContentDisposition": f'inline; filename="processed_{filename}"'
                         },
                         ExpiresIn=DOWNLOAD_EXPIRATION_SECONDS
                     )
                     response_data["downloadUrl"] = download_url
                     response_data["downloadExpiresInSeconds"] = DOWNLOAD_EXPIRATION_SECONDS
+                    response_data["contentType"] = content_type
                 except Exception as s3_err:
                     print(f"Could not generate download URL: {str(s3_err)}")
 
