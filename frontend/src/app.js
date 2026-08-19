@@ -448,9 +448,6 @@ function selectDocument(doc) {
 
   const dlBtn = document.getElementById('btn-download-doc');
   const btnLabel = document.getElementById('btn-download-label') || (dlBtn ? dlBtn.querySelector('span') : null);
-  const previewContainer = document.getElementById('artifact-preview-container');
-  const previewImg = document.getElementById('det-preview-img');
-  const previewFrame = document.getElementById('det-preview-frame');
 
   const lowerName = (doc.filename || '').toLowerCase();
   const isImg = lowerName.endsWith('.png') || lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.webp') || lowerName.endsWith('.gif');
@@ -459,22 +456,8 @@ function selectDocument(doc) {
     dlBtn.onclick = () => window.open(doc.downloadUrl, '_blank');
     dlBtn.style.display = 'inline-flex';
     if (btnLabel) btnLabel.textContent = isImg ? 'View Full Image' : 'View / Download PDF';
-
-    if (previewContainer) {
-      previewContainer.style.display = 'block';
-      if (isImg && previewImg) {
-        previewImg.src = doc.downloadUrl;
-        previewImg.style.display = 'block';
-        if (previewFrame) previewFrame.style.display = 'none';
-      } else if (previewFrame) {
-        previewFrame.src = doc.downloadUrl;
-        previewFrame.style.display = 'block';
-        if (previewImg) previewImg.style.display = 'none';
-      }
-    }
   } else {
     dlBtn.style.display = 'none';
-    if (previewContainer) previewContainer.style.display = 'none';
   }
 
   document.getElementById('det-raw-json').textContent = JSON.stringify(doc.raw, null, 2);
@@ -489,14 +472,6 @@ function resetDetailPane() {
   document.getElementById('det-s3-path').textContent = '--';
   document.getElementById('det-status-badge').textContent = 'AWAITING INPUT';
   document.getElementById('btn-download-doc').style.display = 'none';
-  
-  const previewContainer = document.getElementById('artifact-preview-container');
-  if (previewContainer) previewContainer.style.display = 'none';
-  const previewImg = document.getElementById('det-preview-img');
-  if (previewImg) { previewImg.src = ''; previewImg.style.display = 'none'; }
-  const previewFrame = document.getElementById('det-preview-frame');
-  if (previewFrame) { previewFrame.src = ''; previewFrame.style.display = 'none'; }
-
   document.getElementById('det-raw-json').textContent = JSON.stringify({ message: "Select or upload a document to inspect" }, null, 2);
 }
 
